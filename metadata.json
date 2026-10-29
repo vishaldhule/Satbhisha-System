@@ -1,0 +1,6 @@
+{
+  "name": "JARVIS Mark-XXXIX Autonomous Neural Core",
+  "description": "Next-generation multimodal autonomous AI assistant merging JARVIS Episode 15 and Mark-XXXIX: real-time voice, live code & GUI generator, screen vision, hardware telemetry, deep memory, media automation, and autonomous task execution.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
