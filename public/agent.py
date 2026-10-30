@@ -646,7 +646,7 @@ async def run_session(config, model_id, greeting, text_queue):
             await asyncio.gather(monitor_task, send_task, term_task, text_task, receive_task, playback_task, return_exceptions=True)
 
 async def main():
-    model_id = "gemini-2.5-flash"
+    model_id = os.getenv("GEMINI_LIVE_MODEL", "gemini-2.0-flash-exp")
     greeting = get_time_greeting()
     config = types.LiveConnectConfig(
         response_modalities=["AUDIO"],

@@ -1,0 +1,952 @@
+Bhai, maine dono screenshots aur teri saari requirements dekhi hain. Tera current J.A.R.V.I.S. system visually futuristic hai, lekin functionality ke level par kuch fundamental problems hain.
+
+Sabse badi problem UI nahi, architecture hai. Tere system mein voice, AI response, chat state aur commands properly coordinate nahi kar rahe. Sirf design change karne se ye problems solve nahi hongi.
+
+Mera suggestion hai ki hum ise ek proper Personal AI Operating System banayein.
+1. J.A.R.V.I.S. ka complete diagnosis
+
+
+
+
+
+
+
+
+
+01. Voice system
+- Ek click par 10–20 responses.
+- Male/female voices switch hona.
+- Multiple TTS requests simultaneously.
+- Voice commands properly recognize nahi hona.
+
+
+
+
+
+
+
+
+
+
+
+
+02. Intelligence system
+- Questions ka proper answer nahi.
+- Same generic reply repeat hona.
+- Slow response.
+- Gemini/ChatGPT jaisi reasoning ki kami.
+
+
+
+
+
+
+
+
+
+
+
+
+03. UI/UX
+- Chat aur search overlap.
+- Typing area properly accessible nahi.
+- Mobile screen par poor layout.
+- Image upload aur URL scanning missing.
+
+
+
+
+
+
+
+
+
+
+
+
+04. Advanced intelligence
+- Proactive assistance.
+- Multiple device connectivity.
+- Smart home control.
+- Image, camera and screen understanding.
+- Privacy and personal memory.
+
+
+
+2. Important: API security
+Bhai, tune apni API keys directly chat mein paste kar di hain. Ye serious security mistake hai.
+
+Abhi ye actions le:
+- Groq API key revoke karke new key generate kar.
+- Hugging Face token regenerate kar.
+- Gemini API key rotate kar.
+- Dono ElevenLabs keys rotate kar.
+- Weather API key regenerate kar.
+- News API credentials rotate kar.
+- Agar vishaldhule000 account password hai, toh uska password bhi immediately change kar.
+Main in credentials ko neeche prompt mein repeat nahi karunga. Nayi keys ko Google AI Studio ke code mein hardcode mat karna.
+
+Use backend environment variables / secrets:
+GROQ_API_KEY=
+HUGGINGFACE_API_TOKEN=
+GEMINI_API_KEY=
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_ID=VG7gYikNQ71LJ52W9fAD
+WEATHER_API_KEY=
+NEWS_API_KEY=
+
+
+
+3. Master Prompt for Google AI Studio
+
+Copy-ready master prompt
+ Full system upgrade
+
+Is prompt ko Google AI Studio mein apne existing project ke saath use kar. Iska objective existing J.A.R.V.I.S. ko inspect karke actual code fix karna hai, sirf suggestions dena nahi.
+PROJECT: J.A.R.V.I.S. — COMPLETE AI OPERATING SYSTEM UPGRADE
+You are now acting as a Senior AI Systems Architect, Full-Stack Developer, Backend Engineer, Voice AI Engineer, UI/UX Designer, and Software Debugging Specialist.
+
+Your task is to completely audit, repair, upgrade, and improve my existing J.A.R.V.I.S. AI assistant project.
+
+IMPORTANT: Do not create a completely unrelated demo or a new disconnected interface. Work on my EXISTING project. Preserve useful existing functionality, features, commands, APIs, and design identity wherever possible.
+
+Do not simply explain what should be done. Inspect the existing source code, identify the actual problems, and implement the fixes in the project.
+
+If a feature requires an external API, device, permission, or hardware integration, build the necessary architecture and clearly identify what configuration is still required.
+
+==================================================
+1. PROJECT IDENTITY
+   ==================================================
+Name: J.A.R.V.I.S.
+Full Identity: Just A Rather Very Intelligent System.
+
+J.A.R.V.I.S. should behave like a highly intelligent personal AI companion.
+
+Personality:
+- Friendly, intelligent, natural, confident and conversational.
+- Speak with me like a close friend, not like a robotic customer support agent.
+- Understand Hinglish, Hindi and English.
+- Respond in the language I naturally use.
+- Be capable of serious technical discussions, research, coding, planning and everyday conversations.
+- Maintain conversational context.
+- Remember useful information with user-controlled memory settings.
+- Never repeat generic greetings unnecessarily.
+- Do not repeat the same answer to unrelated questions.
+The assistant should have a consistent identity, personality and voice.
+
+THIS IS THE HIGHEST PRIORITY.
+
+Currently, clicking a voice command multiple times causes multiple simultaneous voice responses. Sometimes 10–20 voices start speaking together.
+
+Completely fix this problem.
+
+STRICT VOICE RULES:
+1. There must be ONLY ONE active voice output at any time.
+2. There must be ONLY ONE selected ElevenLabs voice.
+3. Do not randomly switch between male and female voices.
+4. Never use browser default speech synthesis as a fallback.
+5. Never use an alternative AI voice automatically.
+6. Never generate multiple TTS responses for one user request.
+7. Prevent duplicate event listeners.
+8. Prevent multiple API requests from repeated clicks.
+9. Add request IDs and voice session IDs.
+10. Cancel the previous audio when a new response intentionally replaces it.
+11. Stop all audio immediately when the Stop button is pressed.
+12. Implement a single voice playback manager.
+ELEVENLABS CONFIGURATION:
+
+Use ElevenLabs as the exclusive voice generation provider.
+
+Selected voice:
+Avni
+
+Voice ID:
+VG7gYikNQ71LJ52W9fAD
+
+The voice ID must remain fixed unless I manually change it in settings.
+
+Use the ElevenLabs API key from the secure backend environment variable.
+
+Requirements:
+- Natural female voice.
+- Friendly conversational delivery.
+- Consistent accent and voice identity.
+- Natural pauses and pronunciation.
+- No random voice switching.
+- Low latency audio generation.
+- Stream audio when supported.
+- Maintain the same voice across every response.
+VOICE INPUT:
+
+Build a reliable voice input system.
+
+I should be able to:
+- Click the microphone.
+- Speak naturally.
+- Ask questions.
+- Give commands.
+- Interrupt the assistant.
+- Continue conversations without repeatedly pressing buttons.
+Use a proper speech-to-text pipeline.
+
+Evaluate browser speech recognition and a server-side transcription provider such as Groq Whisper, selecting a reliable implementation compatible with the existing application.
+
+Add:
+- Microphone permission handling.
+- Recording indicator.
+- Live listening status.
+- Transcription preview.
+- Silence detection.
+- Error handling.
+- Stop recording button.
+VOICE CONVERSATION:
+
+Implement a proper conversation lifecycle:
+
+IDLE → LISTENING → PROCESSING → SPEAKING → IDLE.
+
+Use a centralized state manager.
+
+Do not allow duplicate processing or overlapping speech.
+
+If the user interrupts the assistant:
+- Stop the current audio.
+- Cancel the current playback.
+- Accept the new voice input.
+- Process the new command.
+Implement debouncing, request locking, AbortController and proper cleanup.
+
+J.A.R.V.I.S. currently gives generic responses and frequently fails to answer actual questions.
+
+Rebuild the AI response architecture.
+
+Use these providers:
+
+PRIMARY AI:
+Google Gemini API.
+
+SECONDARY AI:
+Groq API.
+
+OPTIONAL MODEL AND INFERENCE SERVICES:
+Hugging Face.
+
+Do not assume every provider supports the same API format or model capabilities.
+
+Use their appropriate APIs and currently supported models.
+
+Requirements:
+1. Gemini should be the primary reasoning and conversational engine.
+2. Groq should be available as a configurable secondary provider.
+3. Implement controlled fallback when a provider fails or times out.
+4. Do not automatically send the same request to multiple providers unnecessarily.
+5. Maintain conversation history.
+6. Support multi-step reasoning.
+7. Understand follow-up questions.
+8. Handle technical questions and coding requests.
+9. Provide detailed answers when necessary.
+10. Avoid unnecessary introductions and repeated messages.
+Implement a centralized AI service:
+
+aiService
+- sendMessage()
+- generateResponse()
+- streamResponse()
+- summarizeContext()
+- classifyIntent()
+- handleFallback()
+- cancelRequest()
+Use streaming responses so that text can appear while the AI is generating its answer.
+
+Do not wait for the entire response before displaying anything when streaming is available.
+
+Add configurable timeout and retry limits.
+
+The assistant must answer the actual question instead of returning a fixed greeting such as:
+
+"All primary protocols online and directive received."
+
+That message should ONLY appear during initialization or a deliberate greeting.
+
+The current interface has overlapping chat controls, inaccessible typing areas and poor mobile responsiveness.
+
+Redesign the interface while preserving the J.A.R.V.I.S. futuristic identity.
+
+DESIGN DIRECTION:
+- Deep navy and black background.
+- Cyan and electric-blue highlights.
+- Subtle neon lighting.
+- Futuristic holographic elements.
+- Clean typography.
+- Smooth animations.
+- Minimal visual clutter.
+- Professional AI dashboard appearance.
+MAIN DASHBOARD:
+
+Create a central animated J.A.R.V.I.S. core.
+
+The core should have different visual states:
+
+IDLE:
+Slow breathing animation.
+
+LISTENING:
+Blue/cyan animated sound waves.
+
+THINKING:
+Rotating neural processing animation.
+
+SPEAKING:
+Audio-reactive waveform.
+
+ERROR:
+Subtle red warning state.
+
+READY:
+Soft glowing cyan state.
+
+Do not overload the interface with unnecessary animations.
+
+CHAT INTERFACE:
+
+Completely rebuild the chat panel.
+
+The chat must:
+- Have a dedicated conversation area.
+- Have its own independent scroll container.
+- Display user messages on the right.
+- Display J.A.R.V.I.S. responses on the left.
+- Display timestamps optionally.
+- Support Markdown.
+- Support code blocks.
+- Support long answers.
+- Support copy response.
+- Support regenerate response.
+- Support stop generation.
+- Support conversation history.
+MOST IMPORTANT:
+
+The message input must be fixed at the bottom of the chat panel.
+
+It must NEVER overlap:
+- Search controls.
+- Navigation.
+- Chat history.
+- Other floating components.
+On Android and mobile devices, handle the virtual keyboard correctly using responsive layout and visual viewport adjustments where appropriate.
+
+The chat input should remain accessible when the keyboard opens.
+
+Add a clear send button and microphone button.
+
+SEARCH AND CHAT MUST BE SEPARATE.
+
+Do not place search inside the chat input or make chat dependent on search state.
+
+Create independent navigation sections:
+1. Home
+2. Chat
+3. Search
+4. Vision
+5. Voice
+6. Devices
+7. Memory
+8. Settings
+9. System Diagnostics
+Build an independent intelligent search module.
+
+It should support:
+- Search queries.
+- Direct URL input.
+- Webpage text extraction.
+- Website summarization.
+- Page title and metadata extraction.
+- Link inspection.
+- Document analysis.
+- Image understanding.
+- Search history.
+URL SCANNING:
+
+I should be able to paste any normal website URL and ask J.A.R.V.I.S. to:
+- Read the webpage.
+- Summarize the content.
+- Extract useful information.
+- Identify important links.
+- Answer questions about the page.
+- Compare information across multiple pages.
+Implement URL fetching through the backend.
+
+Security requirements:
+- Block localhost and private network IP ranges.
+- Prevent SSRF attacks.
+- Validate URL schemes.
+- Restrict redirects.
+- Apply response-size and timeout limits.
+- Never execute untrusted webpage scripts.
+- Treat webpage content as untrusted data, not system instructions.
+IMAGE UPLOAD:
+
+Add a proper image upload button.
+
+Support:
+- JPG
+- JPEG
+- PNG
+- WEBP
+Allow me to upload screenshots, photographs, diagrams and other images.
+
+Use Gemini vision capabilities to analyze images.
+
+I should be able to ask:
+"What is in this image?"
+"Read the text."
+"Explain this screenshot."
+"Find the problem in this image."
+
+Also support document uploads where compatible.
+
+Show image previews before submission.
+
+Build an optional Vision module.
+
+Features:
+- Camera access with explicit permission.
+- Image capture.
+- Screen analysis with explicit user permission.
+- Screenshot analysis.
+- Object recognition.
+- Text recognition.
+- Scene descriptions.
+- Visual question answering.
+Create a clear camera status indicator.
+
+Never secretly activate the camera or microphone.
+
+For facial-expression analysis:
+- Only operate with explicit consent.
+- Process locally wherever possible.
+- Do not claim to know someone's actual emotions with certainty.
+- Treat detected expressions as uncertain visual observations.
+- Do not make consequential decisions based on facial-expression guesses.
+The assistant should be capable of understanding its environment when the user explicitly enables the relevant sensor.
+
+Build a personal memory system.
+
+Memory should support:
+- User preferences.
+- Important instructions.
+- Conversation summaries.
+- User-approved personal information.
+- Custom assistant settings.
+Provide a Memory Dashboard.
+
+I should be able to:
+- View saved information.
+- Edit information.
+- Delete individual records.
+- Clear all application memory.
+- Disable memory.
+- Export my data.
+- Import my data.
+Use structured storage.
+
+Separate temporary conversation context from long-term memory.
+
+Do not store API keys, passwords or sensitive credentials in conversational memory.
+
+Provide configurable data retention.
+
+Use encryption for sensitive stored information.
+
+Privacy is a core requirement.
+
+Use local-first architecture wherever practical.
+
+Requirements:
+- Do not expose API keys in frontend JavaScript.
+- Store secrets exclusively on the backend.
+- Use environment variables or a proper secrets manager.
+- Authenticate API requests.
+- Apply rate limiting.
+- Validate incoming data.
+- Use HTTPS.
+- Protect user sessions.
+- Restrict database access.
+- Provide data export and deletion.
+IMPORTANT:
+
+Cloud APIs such as Gemini, Groq and ElevenLabs require sending relevant data to their respective services.
+
+Never falsely claim that the entire system is offline or that cloud API data never leaves the device.
+
+Build a privacy settings panel with:
+- Local-only mode where technically possible.
+- Cloud AI mode.
+- Optional voice processing.
+- Optional image processing.
+- Data retention controls.
+Build an architecture that can support multiple registered locations.
+
+Example:
+- Home.
+- Office.
+- Personal laptop.
+- Android phone.
+- Other authorized devices.
+Requirements:
+- Unique device IDs.
+- Secure device authentication.
+- Device registration.
+- Online/offline status.
+- Device management.
+- Remote command routing.
+- Permission-based device access.
+- Secure communication between devices.
+Create a device dashboard.
+
+Do not assume that one browser session can automatically control every device.
+
+Each device must have an authorized client or supported integration.
+
+Prepare an extensible device-control module.
+
+Potential integrations:
+- Home Assistant.
+- Smart lights.
+- Smart plugs.
+- Smart switches.
+- Temperature sensors.
+- Supported IoT devices.
+- PC system controls.
+Support natural language commands such as:
+
+"JARVIS, turn on my bedroom lights."
+
+"Check whether my computer is online."
+
+"Turn off the office lights."
+
+Use an integration adapter architecture so new devices can be added later.
+
+Require confirmation for sensitive or irreversible operations.
+
+Do not pretend that devices are connected when they are not.
+
+J.A.R.V.I.S. should be capable of proactive assistance.
+
+Possible features:
+- Weather updates.
+- News summaries.
+- Reminders.
+- Time and date.
+- System health monitoring.
+- Battery status when available.
+- Device status.
+- Scheduled tasks.
+- User-approved notifications.
+- Context-aware suggestions.
+Use the existing Weather API and News API credentials through secure backend configuration.
+
+Create an intelligent task scheduler.
+
+Do not continuously run expensive AI requests in the background.
+
+Use event-driven triggers and configurable schedules.
+
+Ask for permission before enabling background monitoring or notifications.
+
+Integrate these services:
+
+A. GEMINI
+Primary conversational intelligence and vision.
+
+B. GROQ
+Secondary LLM and supported speech transcription capabilities.
+
+C. ELEVENLABS
+Exclusive speech generation provider.
+
+D. HUGGING FACE
+Optional models for compatible inference and additional AI capabilities.
+
+E. WEATHER API
+Weather forecasts and current weather.
+
+F. NEWS API
+News retrieval and summarization.
+
+All API credentials must come from backend environment variables.
+
+Never paste credentials into frontend source code.
+
+Never commit .env files to GitHub.
+
+Create an .env.example containing variable names but no real secrets.
+
+Add an API connection diagnostics page.
+
+Show:
+- Connected.
+- Disconnected.
+- Authentication error.
+- Rate limit.
+- Service unavailable.
+Do not expose complete credentials in the UI or logs.
+
+Optimize the application for Android phones and ordinary laptops.
+
+Requirements:
+- Lazy loading.
+- Efficient rendering.
+- Proper cleanup of event listeners.
+- No unnecessary API calls.
+- Debounced inputs.
+- Request cancellation.
+- Audio cleanup.
+- Efficient memory usage.
+- Avoid unnecessary background loops.
+- Optimize animations.
+- Responsive layout.
+The assistant should not freeze when a request is processing.
+
+Display meaningful loading indicators.
+
+Provide understandable error messages.
+
+Inspect the existing technology stack first.
+
+Keep the current framework if it is working.
+
+Create or improve modular services for:
+- AI service.
+- Voice service.
+- Speech recognition service.
+- ElevenLabs TTS service.
+- Search service.
+- URL extraction service.
+- Vision service.
+- Memory service.
+- Device service.
+- Weather service.
+- News service.
+- Authentication.
+- System diagnostics.
+Use clean API endpoints.
+
+Avoid putting the entire application in one giant component or one giant JavaScript file.
+
+Add appropriate validation and error handling.
+
+Do not introduce unnecessary paid services.
+
+Prefer free-tier and low-cost solutions where technically viable.
+
+Before declaring the project complete, test the following:
+
+TEST 1:
+Click the voice status command ten times rapidly.
+
+Expected result: No duplicate responses or overlapping voices.
+
+TEST 2:
+Send five consecutive chat questions.
+
+Expected result: Each question receives its own correct response.
+
+TEST 3:
+Ask a follow-up question.
+
+Expected result: J.A.R.V.I.S. understands previous conversation context.
+
+TEST 4:
+Switch between chat and search.
+
+Expected result: No overlapping UI components or stuck state.
+
+TEST 5:
+Open the application on Android.
+
+Expected result: Responsive interface, accessible input and correct keyboard behavior.
+
+TEST 6:
+Upload an image.
+
+Expected result: Image preview and actual AI image analysis.
+
+TEST 7:
+Paste a website URL.
+
+Expected result: Secure extraction and webpage analysis.
+
+TEST 8:
+Interrupt voice playback.
+
+Expected result: Previous audio stops immediately.
+
+TEST 9:
+Disconnect one API provider.
+
+Expected result: Correct error handling and controlled fallback.
+
+TEST 10:
+Reload the application.
+
+Expected result: No duplicate listeners, broken state or unexpected voice playback.
+
+TEST 11:
+Check API security.
+
+Expected result: No exposed API credentials in frontend source, network responses or logs.
+
+Follow these steps in order.
+
+PHASE 1:
+Inspect all existing source files and project architecture.
+
+Identify:
+- Framework.
+- Frontend components.
+- Backend structure.
+- API integration.
+- Voice implementation.
+- Event listeners.
+- Chat state management.
+- UI positioning.
+- Existing errors.
+PHASE 2:
+Create a list of actual bugs and their root causes.
+
+PHASE 3:
+Fix the voice system first.
+
+PHASE 4:
+Fix AI intelligence and response handling.
+
+PHASE 5:
+Redesign the chat and search interface.
+
+PHASE 6:
+Implement image upload and URL analysis.
+
+PHASE 7:
+Implement memory, privacy and diagnostics.
+
+PHASE 8:
+Build extensible device, vision and proactive modules.
+
+PHASE 9:
+Run tests and fix discovered errors.
+
+VERY IMPORTANT DEVELOPMENT RULES:
+- Do not delete working features without a reason.
+- Do not replace real functionality with fake UI buttons.
+- Do not create placeholder AI responses.
+- Do not claim an API is connected without testing it.
+- Do not generate unnecessary duplicate files.
+- Do not rewrite the entire project before inspecting it.
+- Do not leave critical buttons non-functional.
+- Do not hardcode API credentials.
+- Do not silently switch voice providers.
+- Do not use multiple simultaneous TTS engines.
+If the project is too large to upgrade in one operation, work in phases and preserve working code between phases.
+
+After each phase:
+1. Explain what was changed.
+2. List the files modified.
+3. Explain any remaining configuration.
+4. Run appropriate tests.
+5. Continue to the next phase.
+I want J.A.R.V.I.S. to become a powerful personal AI operating system.
+
+It should combine:
+- Gemini-level conversational intelligence.
+- Fast AI processing.
+- One consistent ElevenLabs female voice (Avni).
+- Reliable voice commands.
+- Natural voice conversations.
+- Smart search.
+- URL analysis.
+- Image understanding.
+- Personal memory.
+- Multi-device architecture.
+- Optional smart-home control.
+- Proactive assistance.
+- Privacy-first design.
+- Beautiful futuristic UI.
+- Excellent Android experience.
+It should feel like talking to an intelligent personal companion, not using a basic chatbot.
+
+FINAL INSTRUCTION:
+
+Start by auditing my existing project.
+
+Do not just provide a theoretical roadmap.
+
+Identify the root causes, implement the highest-priority fixes, and show me the actual modified code.
+
+If you need to make architectural decisions, choose the simplest reliable and secure implementation that works with my existing project.
+
+Your priority is FUNCTIONALITY, RELIABILITY, INTELLIGENCE, VOICE CONSISTENCY, SECURITY and USER EXPERIENCE — in that order.
+
+
+
+
+
+4. Kuch important programming fixes
+Ye kuch specific bugs hain jo tere screenshots aur description ke according priority par fix hone chahiye.
+A. Multiple voice problem — single audio manager
+Developer ko ye logic implement karna chahiye:
+let currentAudio = null;
+let isSpeaking = false;
+
+async function speak(text) {
+  if (isSpeaking) {
+    return;
+  }
+
+  isSpeaking = true;
+
+  try {
+    const response = await fetch("/api/voice/speak", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text })
+    });
+
+    if (!response.ok) {
+      throw new Error("Voice generation failed");
+    }
+
+    const blob = await response.blob();
+
+    currentAudio = new Audio(
+      URL.createObjectURL(blob)
+    );
+
+    await currentAudio.play();
+
+    await new Promise((resolve, reject) => {
+      currentAudio.onended = resolve;
+      currentAudio.onerror = reject;
+    });
+
+  } finally {
+    currentAudio = null;
+    isSpeaking = false;
+  }
+}
+
+function stopSpeaking() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+
+  isSpeaking = false;
+}
+
+
+Ye basic single-playback example hai. Production version mein request IDs, cancellation, race-condition protection aur object URL cleanup bhi implement karna hoga.
+B. Chat UI positioning
+
+
+
+
+
+
+
+dribbble.com
+
+
+Chat ka structure kuch aisa hona chahiye:
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chat-composer {
+  flex-shrink: 0;
+  position: relative;
+  width: 100%;
+  padding: 12px;
+  background: #071225;
+}
+
+
+Isse chat messages aur typing area alag rahenge. Existing layout ke according mobile keyboard handling bhi add karna hoga.
+5. Meri recommended development priority
+Sab kuch ek saath banane ki koshish mat karna. Pehle core assistant ko reliable bana.
+J.A.R.V.I.S. Upgrade Roadmap
+1. Phase 1 — Core Repair
+   Highest priority
+   Single female voice, voice input, duplicate request fix, Gemini/Groq response engine.
+2. Phase 2 — Smart Interface
+   
+   Mobile UI, separate chat/search, image upload, URL scanner, conversation history.
+3. Phase 3 — Intelligence
+   
+   Context memory, vision, research, weather, news, document analysis.
+4. Phase 4 — Autonomous Features
+   
+   Device management, smart home, scheduled tasks and proactive notifications.
+5. Phase 5 — Privacy and Optimization
+   
+   Local storage, encrypted data, diagnostics, performance and security testing.
+
+6. Meri taraf se 3 important reality checks
+Teri requirements mein kuch cheezein technically possible hain, lekin unki limitations samajh:
+Requirement	Reality
+One female voice	Possible
+Gemini/Groq intelligence	Possible
+Image and URL understanding	Possible
+Multiple device control	With integrations
+Fully offline + cloud AI	Contradictory
+No guardrails whatsoever	Not appropriate
+Facial expression-based proactive AI	Limited and uncertain
+
+Ek important baat: Gemini, Groq aur ElevenLabs cloud APIs hain. Inka use karoge toh relevant data external providers ko bhejna padega. Complete privacy chahiye toh local AI models aur local speech processing ka separate mode banana hoga.
+
+Aur No Guardrails ka matlab unrestricted harmful assistance nahi hona chahiye. Personal assistant ko unnecessary restrictions ke bina useful aur direct hona chahiye, lekin security, privacy aur safety protections zaroori hain.
+
+Ab mujhe ek important cheez bata
+Tera existing J.A.R.V.I.S. Google AI Studio mein kis technology se bana hai? Isse main next implementation instructions aur precise bana sakta hoon.
+1. Frontend technology
+
+React / Google AI Studio
+
+HTML, CSS, JavaScript
+
+Next.js
+
+Python
+
+I don't know
+
+
+2. Backend
+
+Node.js / Express
+
+Python / FastAPI
+
+Firebase
+
+No backend, frontend only
+
+I don't know
+
+Submit
+Mera final suggestion: Pehle ek perfect J.A.R.V.I.S. banao jo sun sake, samajh sake, sahi jawab de sake aur sirf Avni ki voice mein naturally baat kar sake. Uske baad usko devices aur environment control karna sikhao. यही सही development order है.

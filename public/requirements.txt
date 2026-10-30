@@ -1,0 +1,31 @@
+# ==============================================================================
+# J.A.R.V.I.S. EPISODE 19 - COMPLETE PRODUCTION DEPENDENCIES
+# Neural Core & Autonomous Agent Suite by Pulse of AI (Swayam Dhawale)
+# ==============================================================================
+
+# Core Presentation & Office Automation (Episode 18 & 19)
+python-pptx>=1.0.0
+pyautogui>=0.9.54
+pywin32>=306; sys_platform == 'win32'
+pyperclip>=1.8.2
+
+# Multimodal AI & Neural Reasoning Engines
+google-genai>=0.1.1
+groq>=0.9.0
+requests>=2.31.0
+websockets>=12.0
+python-dotenv>=1.0.1
+rich>=13.7.1
+
+# Real-Time Audio, Voice, & Keyboard Controls
+pyaudio>=0.2.14
+keyboard>=0.13.5
+winsdk>=1.0.0b7; sys_platform == 'win32'
+
+# Hardware Telemetry & Background Task Purging
+psutil>=5.9.8
+
+# Computer Vision & Image Processing (Eyes / Screen Vision)
+pillow>=10.2.0
+opencv-python>=4.9.0
+numpy>=1.26.0

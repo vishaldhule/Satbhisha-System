@@ -114,8 +114,9 @@ Format:
             from google import genai
             from google.genai import types
             client = genai.Client(api_key=google_key)
+            model_target = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=model_target,
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
