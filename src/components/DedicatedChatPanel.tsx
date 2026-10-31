@@ -28,6 +28,7 @@ import {
   Globe,
   Radio,
   Eye,
+  Waves,
 } from 'lucide-react';
 
 interface DedicatedChatPanelProps {
@@ -44,6 +45,10 @@ interface DedicatedChatPanelProps {
   onSpeakText: (text: string) => void;
   onOpenGeneratedTool?: (tool: GeneratedTool) => void;
   onOpenHologram?: (hologram: HologramPayload) => void;
+  continuousVoiceMode?: boolean;
+  onToggleContinuousVoiceMode?: () => void;
+  speechLang?: 'hi-IN' | 'en-IN' | 'en-US';
+  onSetSpeechLang?: (lang: 'hi-IN' | 'en-IN' | 'en-US') => void;
 }
 
 export const DedicatedChatPanel: React.FC<DedicatedChatPanelProps> = ({
@@ -60,6 +65,10 @@ export const DedicatedChatPanel: React.FC<DedicatedChatPanelProps> = ({
   onSpeakText,
   onOpenGeneratedTool,
   onOpenHologram,
+  continuousVoiceMode = false,
+  onToggleContinuousVoiceMode,
+  speechLang = 'hi-IN',
+  onSetSpeechLang,
 }) => {
   const [inputText, setInputText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -143,7 +152,34 @@ export const DedicatedChatPanel: React.FC<DedicatedChatPanelProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          {/* Voice Toggle */}
+          {/* Hands-Free Continuous Voice Loop */}
+          {onToggleContinuousVoiceMode && (
+            <button
+              onClick={onToggleContinuousVoiceMode}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-mono border transition-all flex items-center gap-1.5 cursor-pointer ${
+                continuousVoiceMode
+                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] animate-pulse'
+                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200'
+              }`}
+              title="Continuous Hands-Free Conversation: Auto-listens after speaking"
+            >
+              <Waves className={`w-3.5 h-3.5 ${continuousVoiceMode ? 'text-emerald-400' : 'text-slate-400'}`} />
+              <span className="hidden sm:inline font-bold">{continuousVoiceMode ? 'Loop: ON' : 'Hands-Free'}</span>
+            </button>
+          )}
+
+          {/* Speech Language Switcher */}
+          {onSetSpeechLang && (
+            <button
+              onClick={() => onSetSpeechLang(speechLang === 'hi-IN' ? 'en-US' : 'hi-IN')}
+              className="px-2 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-all cursor-pointer"
+              title="Toggle speech recognition language between Hindi/Hinglish and English"
+            >
+              <span>{speechLang === 'hi-IN' ? '🇮🇳 Hindi' : '🇺🇸 EN'}</span>
+            </button>
+          )}
+
+          {/* Voice Output Toggle */}
           <button
             onClick={onToggleVoiceActive}
             className={`p-2 rounded-xl text-xs font-mono border transition-all cursor-pointer ${
@@ -357,6 +393,26 @@ export const DedicatedChatPanel: React.FC<DedicatedChatPanelProps> = ({
 
       {/* Fixed Composer Bottom Container (Strict Architecture: NEVER overlaps messages or drawers) */}
       <div className="flex-shrink-0 relative w-full p-3 sm:p-4 bg-[#071225] border-t border-slate-800 shadow-2xl">
+        {/* Proactive Next Steps & Inquiries Bar */}
+        <div className="max-w-5xl mx-auto w-full mb-2.5 overflow-x-auto scrollbar-none flex items-center gap-1.5 pb-1">
+          <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider flex-shrink-0 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <span>Next Ask:</span>
+          </span>
+          {quickActionChips.map((chip, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => {
+                onSendMessage(chip.text);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-cyan-950/80 border border-slate-800 hover:border-cyan-500/50 text-[11px] font-mono text-slate-300 hover:text-cyan-300 transition-all cursor-pointer whitespace-nowrap flex-shrink-0 shadow"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-5xl mx-auto w-full">
           {/* Hidden File Input for images */}
           <input

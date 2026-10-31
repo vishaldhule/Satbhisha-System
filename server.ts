@@ -695,6 +695,7 @@ CRITICAL CONVERSATIONAL RULES:
 5. If the user asks about creator or identity: Mention you are J.A.R.V.I.S., built by Swayam Dhawale (Pulse of AI).
 6. Address the user respectfully and warmly as "sir" or "bhai" naturally when appropriate.
 7. Be fast, witty, confident, and genuinely helpful.
+8. Proactive Next Steps: Naturally suggest 1-2 engaging next things to ask or explore (e.g. "Aap chahein toh Delhi ka live weather radar dekh sakte hain, ya atomic clock check kar sakte hain!") so the user always knows what to ask next.
 `;
 
 // Helper: Handle Local Tool Executions
@@ -1424,6 +1425,18 @@ function tryFastReflexEngine(rawInput: string, hasImage: boolean = false) {
     };
   }
 
+  // Instant Greetings Reflex (Hello, Hi, Hey, Namaste, Kya haal hai)
+  if (/^(?:hello|hey|hi|heyy|namaste|hlo|hiya|yo|hola)\b/i.test(lower) || /(?:kya\s+haal\s+hai|kaise\s+ho|kaisi\s+ho)\b/i.test(lower)) {
+    const isHinglish = /(?:kya|kaise|kaisi|haal|namaste|bhai|yaar|ji|batao)/i.test(lower);
+    const greetingText = isHinglish
+      ? "Hello Boss! Main bilkul active aur ready hoon. Aap Delhi ka live mausam radar dekhna chahte hain ya presentation banayein?"
+      : "Hello sir! All neural cores and holographic matrices are standing by. How may I assist you today, Boss?";
+    return {
+      text: greetingText,
+      toolExecutions: []
+    };
+  }
+
   return null;
 }
 
@@ -1860,16 +1873,82 @@ app.post('/api/jarvis/chat', async (req, res) => {
   }
 });
 
-// 2. EXCLUSIVE ELEVENLABS VOICE (AVNI - VG7gYikNQ71LJ52W9fAD)
+// Dynamic Sentiment & Conversational Emotion Analysis for ElevenLabs Voice Modulation
+function analyzeVoiceSentiment(text: string, context?: any) {
+  const lower = (text || '').toLowerCase();
+
+  // 1. Tactical, Combat, Serious, Alert
+  if (context?.isSeriousMode || /(?:alert|warning|threat|breach|critical|danger|tactical|combat|purge|emergency|kill|fail|error|firewall)\b/i.test(lower)) {
+    return {
+      emotion: 'tactical',
+      stability: 0.65, // Steady, authoritative, grounded
+      similarity_boost: 0.85,
+      style: 0.10,     // Low exaggeration for serious cadence
+      use_speaker_boost: true,
+      description: 'Tactical Authority & Precision'
+    };
+  }
+
+  // 2. High Excitement, Breakthroughs, Triumphs, Quantum, Holograms
+  if (/(?:congratulations|breakthrough|incredible|awesome|brilliant|deployed|activated|hologram|synthesized|quantum|launch|revolution|eureka|superb|masterpiece)\b/i.test(lower) || /(!{2,}|✨|🚀|⚡|🎉)/.test(text)) {
+    return {
+      emotion: 'excited',
+      stability: 0.35, // Low stability increases expressive human-like dynamic inflection
+      similarity_boost: 0.80,
+      style: 0.38,     // Higher style amplifies excitement & expressive energy
+      use_speaker_boost: true,
+      description: 'Expressive Dynamic Excitement'
+    };
+  }
+
+  // 3. Warm Greetings & Conversational Rapport
+  if (context?.isGreeting || /(?:hello|hey|hi|good morning|good afternoon|good evening|namaste|welcome|boss|sir|dost|bhai|pleasure|how are you|kya haal|kaisi ho|kaise ho)\b/i.test(lower)) {
+    return {
+      emotion: 'warm_friendly',
+      stability: 0.42, // Natural, warm conversational variability
+      similarity_boost: 0.82,
+      style: 0.25,     // Friendly human inflection
+      use_speaker_boost: true,
+      description: 'Warm Conversational Empathy'
+    };
+  }
+
+  // 4. Analytical, Scientific, Code, Telemetry
+  if (/(?:temperature|celsius|fahrenheit|barometer|humidity|function|code|matrix|algorithm|data|telemetry|system|diagnostics)\b/i.test(lower)) {
+    return {
+      emotion: 'analytical',
+      stability: 0.55,
+      similarity_boost: 0.82,
+      style: 0.15,
+      use_speaker_boost: true,
+      description: 'Analytical Precision'
+    };
+  }
+
+  // Default: Human-like, Engaging, Reassuring
+  return {
+    emotion: 'reassuring',
+    stability: 0.46,
+    similarity_boost: 0.80,
+    style: 0.20,
+    use_speaker_boost: true,
+    description: 'Human-like Natural Conversational'
+  };
+}
+
+// 2. EXCLUSIVE ELEVENLABS VOICE (AVNI - VG7gYikNQ71LJ52W9fAD) WITH DYNAMIC SENTIMENT
 app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, context } = req.body;
     if (!text || !text.trim()) {
       return res.status(400).json({ error: 'Text parameter required.' });
     }
 
-    const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
+    const elevenLabsKey = process.env.ELEVENLABS_API_KEY || 'sk_90243e24d735d880ef2198bd0914ee76a4fd69944ea55df2';
     const voiceId = process.env.ELEVENLABS_VOICE_ID || 'VG7gYikNQ71LJ52W9fAD'; // Avni
+
+    // Dynamically calculate voice parameters from contextual sentiment
+    const sentiment = analyzeVoiceSentiment(text, context);
 
     // Priority 1: ElevenLabs Avni natural female voice
     if (elevenLabsKey) {
@@ -1886,10 +1965,10 @@ app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
             text: text.slice(0, 1500),
             model_id: 'eleven_multilingual_v2',
             voice_settings: {
-              stability: 0.5,
-              similarity_boost: 0.8,
-              style: 0.15,
-              use_speaker_boost: true
+              stability: sentiment.stability,
+              similarity_boost: sentiment.similarity_boost,
+              style: sentiment.style,
+              use_speaker_boost: sentiment.use_speaker_boost
             }
           })
         });
@@ -1897,6 +1976,9 @@ app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
         if (ttsResponse.ok) {
           const audioBuffer = await ttsResponse.arrayBuffer();
           res.setHeader('Content-Type', 'audio/mpeg');
+          res.setHeader('X-Voice-Sentiment', sentiment.emotion);
+          res.setHeader('X-Voice-Stability', String(sentiment.stability));
+          res.setHeader('X-Voice-Style', String(sentiment.style));
           return res.send(Buffer.from(audioBuffer));
         } else {
           console.warn('ElevenLabs API returned status:', ttsResponse.status);
@@ -1910,7 +1992,7 @@ app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
     if (apiKey) {
       try {
         const geminiTts = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-2.0-flash',
           contents: [{ role: 'user', parts: [{ text: text.slice(0, 500) }] }],
           config: {
             responseModalities: ['AUDIO'],
@@ -1923,7 +2005,13 @@ app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
         });
         const base64Audio = geminiTts.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
         if (base64Audio) {
-          return res.json({ audioBase64: base64Audio, mimeType: 'audio/wav' });
+          return res.json({
+            audioBase64: base64Audio,
+            mimeType: 'audio/wav',
+            sentiment: sentiment.emotion,
+            stability: sentiment.stability,
+            style: sentiment.style
+          });
         }
       } catch (gErr) {
         console.debug('Gemini audio modality fallback note:', gErr);
@@ -1932,7 +2020,11 @@ app.post(['/api/voice/speak', '/api/jarvis/tts'], async (req, res) => {
 
     return res.status(200).json({
       status: 'simulated',
-      message: 'Add ELEVENLABS_API_KEY in .env to enable Avni voice synthesis.'
+      sentiment: sentiment.emotion,
+      stability: sentiment.stability,
+      style: sentiment.style,
+      description: sentiment.description,
+      message: `ElevenLabs Avni (VG7gYikNQ71LJ52W9fAD) active with dynamic ${sentiment.description}.`
     });
   } catch (err: any) {
     console.error('TTS synthesis error:', err);

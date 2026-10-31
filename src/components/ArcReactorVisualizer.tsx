@@ -17,6 +17,13 @@ export const ArcReactorVisualizer: React.FC<ArcReactorProps> = ({
 }) => {
   const [rotation, setRotation] = useState(0);
   const [pulse, setPulse] = useState(0);
+  const [isTouched, setIsTouched] = useState(false);
+
+  const handleClick = () => {
+    setIsTouched(true);
+    setTimeout(() => setIsTouched(false), 600);
+    if (onClick) onClick();
+  };
 
   useEffect(() => {
     let animId: number;
@@ -38,7 +45,9 @@ export const ArcReactorVisualizer: React.FC<ArcReactorProps> = ({
 
   // Neon theme
   const coreCyan = persona === 'friday' ? '#06b6d4' : '#00e5ff';
-  const coreGlow = isSpeaking
+  const coreGlow = isTouched
+    ? '#38bdf8' // Bright Sky Blue on Touch
+    : isSpeaking
     ? '#10b981' // Green on speak
     : isProcessing
     ? '#f59e0b' // Amber on process
@@ -46,15 +55,21 @@ export const ArcReactorVisualizer: React.FC<ArcReactorProps> = ({
     ? '#00e5ff' // Electric cyan on listen
     : '#0284c7'; // Stark Blue on idle
 
-  const scale = 1 + (isListening ? (audioLevel / 100) * 0.12 : isSpeaking ? pulse * 0.08 : pulse * 0.03);
+  const scale = 1 + (isTouched ? 0.12 : isListening ? (audioLevel / 100) * 0.12 : isSpeaking ? pulse * 0.08 : pulse * 0.03);
 
   return (
     <div
-      onClick={onClick}
-      className="relative flex items-center justify-center cursor-pointer select-none group"
+      onClick={handleClick}
+      className={`relative flex items-center justify-center cursor-pointer select-none group transition-transform duration-200 active:scale-95 ${
+        isTouched ? 'scale-105' : ''
+      }`}
       style={{ width: '240px', height: '240px' }}
-      title="Click to trigger Arc Reactor Diagnostic Surge"
+      title="Touch Arc Reactor to interact via tactile biometric voice link"
     >
+      {/* Tactile Touch Shockwave Ring */}
+      {isTouched && (
+        <div className="absolute inset-[-20px] rounded-full border-2 border-cyan-400 animate-ping pointer-events-none" />
+      )}
       {/* 1. Outer Neon Holographic Aura */}
       <div
         className="absolute inset-0 rounded-full transition-all duration-300 blur-2xl opacity-50"

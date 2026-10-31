@@ -53,6 +53,7 @@ import { HologramProjectionModal } from './components/HologramProjectionModal';
 import { SystemHardware, MediaState, GeneratedTool, ChatMessage, MemoryItem, HologramPayload } from './types';
 import { HandTrackerConfig, DEFAULT_HAND_CONFIG } from './utils/handTracker';
 import { voiceManager } from './utils/voiceManager';
+import { jarvisAudio } from './utils/sound_effects';
 import {
   playStartupChime,
   playToolChime,
@@ -142,8 +143,11 @@ export default function App() {
   const [audioEnergyLevel, setAudioEnergyLevel] = useState(15);
   const [lastActionBadge, setLastActionBadge] = useState<string | null>(null);
 
-  // Audio & Speech Recognition Refs
+  // Audio & Speech Recognition Refs & Continuous Voice Mode
+  const [continuousVoiceMode, setContinuousVoiceMode] = useState(false);
+  const [speechLang, setSpeechLang] = useState<'hi-IN' | 'en-IN' | 'en-US'>('hi-IN');
   const recognitionRef = useRef<any>(null);
+  const lastTouchIdx = useRef(0);
 
   // Save hand config
   useEffect(() => {
@@ -160,8 +164,23 @@ export default function App() {
         setAudioEnergyLevel(energy);
       }
     });
-    return () => unsubscribe();
-  }, []);
+
+    // Auto-listen loop: whenever J.A.R.V.I.S. finishes speaking in Continuous Voice Mode, start listening
+    const unsubscribeEnded = voiceManager.onSpeechEnded(() => {
+      if (continuousVoiceMode && !isProcessing && voiceActive) {
+        setTimeout(() => {
+          if (!isListening && continuousVoiceMode) {
+            startListening();
+          }
+        }, 350);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeEnded();
+    };
+  }, [continuousVoiceMode, isProcessing, voiceActive, isListening, speechLang]);
 
   // Initial Boot Sequence
   useEffect(() => {
@@ -223,9 +242,8 @@ export default function App() {
     }
   };
 
-  // Toggle Speech Recognition with Instant Barge-In Audio Interruption
-  const toggleListening = () => {
-    // Interruption lock: stop speaking whenever user starts listening or talks
+  // Start Speech Recognition with user-selected language (hi-IN or en-US)
+  const startListening = () => {
     handleStopSpeech();
 
     const SpeechRecognition =
@@ -236,33 +254,86 @@ export default function App() {
       return;
     }
 
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch {}
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = speechLang;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      playMicActivateChime();
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      if (transcript) {
+        setIsListening(false);
+        handleSendMessage(transcript);
+      }
+    };
+
+    recognition.onerror = (e: any) => {
+      console.warn('Speech recognition error:', e);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
+
+  // Toggle Speech Recognition with Instant Barge-In Audio Interruption
+  const toggleListening = () => {
     if (isListening) {
-      if (recognitionRef.current) recognitionRef.current.stop();
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
       setIsListening(false);
     } else {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        setIsListening(true);
-        playMicActivateChime();
-      };
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        if (transcript) handleSendMessage(transcript);
-      };
-      recognition.onerror = () => setIsListening(false);
-      recognition.onend = () => setIsListening(false);
-
-      recognitionRef.current = recognition;
-      try {
-        recognition.start();
-      } catch {
-        setIsListening(false);
-      }
+      startListening();
     }
+  };
+
+  // Tactile Biometric Touch & Instant Voice Link on Arc Reactor (Home Screen)
+  const handleArcReactorTouch = () => {
+    // If already listening, clicking toggles off
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+      setIsListening(false);
+      setLastActionBadge('Voice input standby');
+      return;
+    }
+
+    // Interruption lock: stop speaking whenever user touches arc to talk
+    handleStopSpeech();
+
+    // High-tech tactile power up sound
+    jarvisAudio.playPowerUp();
+    setTimeout(() => jarvisAudio.playChirp(), 130);
+
+    setLastActionBadge('🎙️ ARC BIOMETRIC TOUCH LINK // LISTENING... BOLIYE BOSS');
+
+    // Instantly activate microphone speech recognition
+    startListening();
   };
 
   // Main Unified Message Sender (Handles Text, Voice, and Attached Images)
@@ -624,21 +695,26 @@ export default function App() {
         {/* Section 1: CORE / HOME (Arc Reactor Visualizer + Vitals) */}
         {activeSection === 'core' && (
           <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto max-w-4xl mx-auto w-full text-center my-auto space-y-6">
-            {/* Centerpiece: Mark-85 Arc Reactor */}
+            {/* Centerpiece: Mark-85 Arc Reactor with Biometric Touch */}
             <div className="relative flex flex-col items-center">
               <ArcReactorVisualizer
-                status={isProcessing ? 'processing' : isListening ? 'listening' : 'idle'}
+                status={isProcessing ? 'processing' : isListening ? 'listening' : isSpeaking ? 'speaking' : 'idle'}
                 audioLevel={isSpeaking ? audioEnergyLevel : isListening ? 80 : 15}
                 persona="friday"
                 outputPower={hardware.battery}
-                onClick={() => {
-                  playStartupChime();
-                  handleSendMessage('Status report and system health, Boss');
-                }}
+                onClick={handleArcReactorTouch}
               />
 
-              {/* Status Indicator */}
+              {/* Status Indicator & Live Voice Dialogue Status */}
               <div className="mt-5 flex flex-col items-center gap-2">
+                <button
+                  onClick={handleArcReactorTouch}
+                  className="text-[11px] font-mono text-cyan-300 hover:text-cyan-200 bg-cyan-950/60 hover:bg-cyan-900/60 px-3.5 py-1 rounded-full border border-cyan-500/40 hover:border-cyan-400 transition-all cursor-pointer flex items-center gap-1.5 shadow-[0_0_12px_rgba(0,229,255,0.2)]"
+                >
+                  <Sparkles className="w-3 h-3 text-cyan-400 animate-pulse" />
+                  <span>Tap Arc Reactor &amp; Speak — J.A.R.V.I.S. will answer in voice</span>
+                </button>
+
                 {isProcessing ? (
                   <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 text-xs font-mono animate-pulse">
                     <BrainCircuit className="w-4 h-4 animate-spin text-cyan-400" />
@@ -647,7 +723,12 @@ export default function App() {
                 ) : isSpeaking ? (
                   <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/70 border border-cyan-400 text-cyan-300 text-xs font-mono shadow-[0_0_15px_rgba(0,229,255,0.4)]">
                     <Waves className="w-4 h-4 text-cyan-400 animate-pulse" />
-                    <span>Avni (ElevenLabs) Speaking...</span>
+                    <span>Speaking in Avni Voice... (Click Stop Voice anytime)</span>
+                  </div>
+                ) : isListening ? (
+                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-400 text-emerald-300 text-xs font-mono shadow-[0_0_15px_rgba(16,185,129,0.4)] animate-pulse">
+                    <Mic className="w-4 h-4 text-emerald-400" />
+                    <span>Listening ({speechLang === 'hi-IN' ? 'Hindi / Hinglish' : 'English'})... Speak now</span>
                   </div>
                 ) : lastActionBadge ? (
                   <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-lg animate-in fade-in duration-300">
@@ -660,6 +741,61 @@ export default function App() {
                     <span>Cognitive Pipeline Nominal • Ready for Commands</span>
                   </div>
                 )}
+              </div>
+
+              {/* Direct Voice Dialogue Quick Controls */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {/* Continuous Hands-Free Voice Mode Button */}
+                <button
+                  onClick={() => {
+                    const nextMode = !continuousVoiceMode;
+                    setContinuousVoiceMode(nextMode);
+                    playToolChime();
+                    if (nextMode) {
+                      setLastActionBadge('🎙️ Continuous Voice Dialogue Mode Active');
+                      speakResponse('Continuous voice dialogue mode activated, sir. I am listening continuously.');
+                    } else {
+                      setLastActionBadge('🎙️ Continuous Voice Dialogue Paused');
+                      handleStopSpeech();
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-tech font-bold uppercase transition-all flex items-center gap-2 cursor-pointer shadow-lg ${
+                    continuousVoiceMode
+                      ? 'bg-gradient-to-r from-emerald-600/30 to-teal-600/30 border-emerald-400 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-pulse'
+                      : 'bg-slate-900/80 hover:bg-slate-800 border-slate-700 text-slate-300'
+                  }`}
+                  title="Hands-free conversation: J.A.R.V.I.S. automatically listens after speaking"
+                >
+                  <Waves className={`w-3.5 h-3.5 ${continuousVoiceMode ? 'text-emerald-400' : 'text-slate-400'}`} />
+                  <span>{continuousVoiceMode ? 'Hands-Free Loop: ON' : 'Enable Hands-Free Voice'}</span>
+                </button>
+
+                {/* Instant Mic Push-to-Talk */}
+                <button
+                  onClick={toggleListening}
+                  className={`px-3 py-1.5 rounded-xl border text-xs font-tech font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer shadow-lg ${
+                    isListening
+                      ? 'bg-rose-500/30 border-rose-400 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.4)] animate-pulse'
+                      : 'bg-cyan-500/20 hover:bg-cyan-500/30 border-cyan-500/50 text-cyan-300'
+                  }`}
+                >
+                  {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                  <span>{isListening ? 'Stop Listening' : 'Speak to JARVIS'}</span>
+                </button>
+
+                {/* Language Switcher */}
+                <button
+                  onClick={() => {
+                    const nextLang = speechLang === 'hi-IN' ? 'en-US' : 'hi-IN';
+                    setSpeechLang(nextLang);
+                    playToolChime();
+                    setLastActionBadge(`Language: ${nextLang === 'hi-IN' ? 'Hindi / Hinglish' : 'English'}`);
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-all cursor-pointer"
+                  title="Switch Speech Recognition Language"
+                >
+                  <span>{speechLang === 'hi-IN' ? '🇮🇳 Hindi / Hinglish' : '🇺🇸 English (US)'}</span>
+                </button>
               </div>
             </div>
 
@@ -730,6 +866,20 @@ export default function App() {
               setActiveHologram(holo);
               setIsHologramModalOpen(true);
             }}
+            continuousVoiceMode={continuousVoiceMode}
+            onToggleContinuousVoiceMode={() => {
+              const nextMode = !continuousVoiceMode;
+              setContinuousVoiceMode(nextMode);
+              if (nextMode) {
+                setLastActionBadge('🎙️ Continuous Voice Dialogue Mode Active');
+                speakResponse('Continuous voice dialogue mode activated, sir. I am listening continuously.');
+              } else {
+                setLastActionBadge('🎙️ Continuous Voice Dialogue Paused');
+                handleStopSpeech();
+              }
+            }}
+            speechLang={speechLang}
+            onSetSpeechLang={(l) => setSpeechLang(l)}
           />
         )}
 
