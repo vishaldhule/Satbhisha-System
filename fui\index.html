@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS // TACTICAL HOLOGRAPHIC FUI</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Ambient CRT Scanline & Lens Vignette Overlays -->
+<div class="scanlines-overlay"></div>
+<div class="hud-vignette"></div>
+<!-- TOP HEADER HUD -->
+<header class="header-hud">
+<div class="header-left">
+<div class="system-logo">⚡</div>
+<div class="system-title">JARVIS TACTICAL FUI</div>
+<div class="system-ver">SYS v4.2</div>
+<div class="creator-tag">// FOUNDER: SWAYAM DHAWALE (PULSE OF AI)</div>
+</div>
+<div class="header-center">
+<div class="mission-time" id="mission-time">--:--:--.--- IST</div>
+<div class="status-badge connecting" id="bridge-status">INITIALIZING BRIDGE...</div>
+<div class="status-badge online" id="ping-display">12ms</div>
+</div>
+<div class="header-right">
+<button class="hud-btn" id="btn-3d-toggle">3D TILT: ON</button>
+<button class="hud-btn" id="btn-audio-mute">SFX: ON</button>
+<button class="hud-btn serious-btn" id="btn-serious">
+<span class="icon">⚡</span> SERIOUS MODE
+</button>
+</div>
+</header>
+<!-- MAIN 3-COLUMN TACTICAL VIEWPORT -->
+<main class="viewport-grid">
+<!-- LEFT PANEL: SYSTEM TELEMETRY & CONTROLS -->
+<aside class="hud-card left-panel">
+<div class="card-header">
+<span class="card-title">NEURAL TELEMETRY</span>
+<span class="card-tag">SYSTEM VITALS</span>
+</div>
+<div class="card-content">
+<!-- CPU Metric -->
+<div class="telemetry-row">
+<div class="metric-header">
+<span>CPU UTILIZATION</span>
+<span class="metric-value" id="cpu-val">24%</span>
+</div>
+<div class="gauge-track">
+<div class="gauge-bar" id="cpu-bar" style="width: 24%"></div>
+</div>
+</div>
+<!-- RAM Metric -->
+<div class="telemetry-row">
+<div class="metric-header">
+<span>MEMORY ALLOCATION</span>
+<span class="metric-value" id="ram-val">42%</span>
+</div>
+<div class="gauge-track">
+<div class="gauge-bar" id="ram-bar" style="width: 42%"></div>
+</div>
+</div>
+<!-- Temperature Metric -->
+<div class="telemetry-row">
+<div class="metric-header">
+<span>CORE THERMAL</span>
+<span class="metric-value" id="temp-val">46°C</span>
+</div>
+<div class="gauge-track">
+<div class="gauge-bar" id="temp-bar" style="width: 46%"></div>
+</div>
+</div>
+<!-- Battery Metric -->
+<div class="telemetry-row">
+<div class="metric-header">
+<span>POWER CELL / BATTERY</span>
+<span class="metric-value" id="battery-val">98%</span>
+</div>
+<div class="gauge-track">
+<div class="gauge-bar" id="battery-bar" style="width: 98%"></div>
+</div>
+</div>
+<!-- Volume Slider -->
+<div class="slider-group">
+<div class="slider-label">
+<span>MASTER AUDIO OUTPUT</span>
+<span id="volume-val">VOLUME</span>
+</div>
+<input type="range" min="0" max="100" value="70" class="hud-slider" id="volume-slider">
+</div>
+<!-- Brightness Slider -->
+<div class="slider-group">
+<div class="slider-label">
+<span>DISPLAY BRIGHTNESS</span>
+<span id="brightness-val">ILLUMINATION</span>
+</div>
+<input type="range" min="0" max="100" value="65" class="hud-slider" id="brightness-slider">
+</div>
+</div>
+</aside>
+<!-- CENTER PANEL: 3D HOLOGRAPHIC ARC REACTOR -->
+<section class="hud-card center-stage">
+<div class="canvas-container">
+<canvas id="arc-canvas"></canvas>
+</div>
+</section>
+<!-- RIGHT PANEL: PACKET DATA FLOW & TOOLS MATRIX -->
+<aside class="hud-card right-panel">
+<div class="card-header">
+<span class="card-title">PACKET_DATA_FLOW</span>
+<span class="card-tag">SYSTEM BUS 0x8840</span>
+</div>
+<div class="card-content">
+<div class="packet-stream-box" id="packet-stream"></div>
+<div style="font-size: 10px; font-weight: 700; color: var(--text-cyan); margin-top: 4px;">
+AUTONOMOUS TOOLS MATRIX
+</div>
+<div class="tools-grid">
+<div class="tool-badge" data-tool="open_application" data-prompt="Open Calculator">
+📱 Calculator
+</div>
+<div class="tool-badge" data-tool="open_website" data-prompt="Open YouTube">
+🌐 Open YouTube
+</div>
+<div class="tool-badge" data-tool="get_system_vitals" data-prompt="Give me full diagnostic syst
+em vitals, sir."> ⚙️ System Vitals
+</div>
+<div class="tool-badge" data-tool="control_media" data-prompt="Toggle media play pause"> 🎵 Media Controller
+</div>
+<div class="tool-badge" data-tool="purge_background_tasks" data-prompt="Purge background tasks
+and optimize memory">
+🧹 Purge RAM
+</div>
+<div class="tool-badge" data-tool="get_battery_status" data-prompt="What is my battery level?">
+🔋 Battery State
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- BOTTOM HUD: OSCILLOSCOPE, LOGS TERMINAL, COMMAND INPUT -->
+<footer class="bottom-hud">
+<div class="hud-card audio-scope-card">
+<div class="card-header">
+<span class="card-title">AUDIO WAVEFORM</span>
+<span class="card-tag">PCM 16k/24k</span>
+</div>
+<div class="card-content" style="padding: 6px;">
+<canvas id="oscilloscope-canvas"></canvas>
+<div class="voice-status-wrap">
+<span style="font-size: 9px; color: var(--text-dim);">VOICE PROTOCOL:</span>
+<span class="voice-badge idle" id="voice-state-badge">HANDS-FREE</span>
+</div>
+</div>
+</div>
+<div class="hud-card terminal-card">
+<div class="card-header">
+<span class="card-title">NEURAL DIALOGUE STREAM</span>
+<span class="card-tag">OMNI-INPUT CONSOLE</span>
+</div>
+<div class="chat-logs-area" id="chat-logs">
+<div class="log-entry log-system">
+<span class="log-tag">[SYSTEM INIT]</span>
+<span class="log-text">JARVIS Multimodal Neural HUD Online.</span>
+</div>
+</div>
+<div class="command-bar-wrapper">
+<div class="command-input-row">
+<input type="text" id="cmd-input" class="hud-input" placeholder="Transmit command to JARVIS..."
+autocomplete="off" />
+<button class="transmit-btn" id="btn-transmit">TRANSMIT</button>
+</div>
+<div class="quick-actions-row">
+<button class="quick-btn" data-prompt="Give me full system vitals and temperature diagnostics,
+sir.">📊 SYSTEM VITALS</button>
+<button class="quick-btn" data-prompt="Purge all background tasks and optimize memory, sir.">🧹
+PURGE RAM</button>
+<button class="quick-btn" data-prompt="What is my battery level?">🔋 BATTERY</button>
+<button class="quick-btn" data-action="toggle_serious">⚡ TOGGLE SERIOUS MODE</button>
+</div>
+</div>
+</div>
+</footer>
+<script src="sound_effects.js"></script>
+<script src="arc_reactor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
